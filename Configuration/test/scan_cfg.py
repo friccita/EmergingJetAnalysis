@@ -103,14 +103,7 @@ if 'analyze' in options.steps:
     print ''
     analyzeStep = addAnalyze(process, options.data, options.sample)
 
-
-########################################
-# Testing step
-########################################
-testingStep = cms.Sequence()
-testingStep = addTesting(process, options.data, options.sample)
-
-process.p = cms.Path( skimStep * testingStep * analyzeStep )
+process.p = cms.Path( skimStep * analyzeStep )
 
 if 'skim' in options.steps and len(options.steps)==1:
     # If only running skim, add AOD/AODSIM and jetFilter/wJetFilter to output
@@ -150,7 +143,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = cms.untracked.int32(1)
 process.MessageLogger.cerr.FwkReport.limit = 20
 process.MessageLogger.cerr.default.limit = 100
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(50) )
 
 process.source = cms.Source("PoolSource",
     # eventsToProcess = cms.untracked.VEventRange("1:36:3523-1:36:3523"),
@@ -159,9 +152,8 @@ process.source = cms.Source("PoolSource",
         # '/store/group/phys_exotica/EmergingJets/EmergingJets_ModelA_TuneCUETP8M1_13TeV_pythia8Mod/AODSIM/150717_090102/0000/aodsim_1.root'
         # QCD MC 74X
         # '/store/mc/RunIISpring15DR74/QCD_HT700to1000_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/AODSIM/Asympt25ns_MCRUN2_74_V9-v1/00000/10198812-0816-E511-A2B5-AC853D9DAC1D.root'
-        '/store/mc/RunIISpring15DR74/QCD_HT2000toInf_TuneCUETP8M1_13TeV-madgraphMLM-pythia8/AODSIM/Asympt25ns_MCRUN2_74_V9-v1/00000/025B6100-A217-E511-AF6F-0002C92DB46C.root'
         # data skim
-        # '/store/group/phys_exotica/EmergingJets/DataSkim-20160302-v0/Run2015D/JetHT/DataSkim-20160302/160303_061653/0000/output_1.root'
+        '/store/group/phys_exotica/EmergingJets/DataSkim-20160302-v0/Run2015D/JetHT/DataSkim-20160302/160303_061653/0000/output_1.root'
         # wjet
         # '/store/group/phys_exotica/EmergingJets/wjetskim-v0/SingleMuonD-PRv3/SingleMuon/WJetSkim/151028_030342/0000/output_1.root'
         # wjet MC
@@ -179,6 +171,8 @@ process.TFileService = cms.Service("TFileService", fileName = cms.string("ntuple
 
 # storage
 process.outpath = cms.EndPath(process.out)
+
+process.emJetAnalyzer.srcJets = cms.InputTag("ak4PFJetsCHS")
 
 process.load("TrackingTools/TransientTrack/TransientTrackBuilder_cfi")
 
